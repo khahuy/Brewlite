@@ -34,7 +34,7 @@ Tạo một file `.env` tại thư mục gốc của dự án (nếu chưa có) 
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb+srv://<USERNAME>:<PASSWORD>@brewlite-cluster.gqbpydy.mongodb.net/brewlite_db?appName=brewlite-cluster
+MONGODB_URI=mongodb+srv://vohuunghiaah_db_user:<PASSWORD>@brewlite-cluster.gqbpydy.mongodb.net/brewlite_db?appName=brewlite-cluster
 ```
 
 > **Lưu ý quan trọng về bảo mật:**
