@@ -38,7 +38,7 @@ MONGODB_URI=mongodb+srv://<USERNAME>:<PASSWORD>@brewlite-cluster.gqbpydy.mongodb
 ```
 
 > **Lưu ý quan trọng về bảo mật:**
-> - Thay thế `<USERNAME>` và `<PASSWORD>` bằng tài khoản Database User thực tế của bạn trên MongoDB Atlas.
+> - Thay thế `<PASSWORD>` bằng tài khoản Database User thực tế của bạn trên MongoDB Atlas.
 > - File `.env` chứa mật khẩu đã được thêm vào `.gitignore`, **tuyệt đối không commit hoặc push file `.env` lên GitHub/GitLab**.
 
 ---
