@@ -1,27 +1,23 @@
 {
   "name": "brewlite",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
   "scripts": {
+    "dev": "concurrently -n backend,frontend -c cyan,magenta \"npm run start:dev -w apps/backend\" \"npm run dev -w apps/frontend\"",
+    "dev:backend": "npm run start:dev -w apps/backend",
+    "dev:frontend": "npm run dev -w apps/frontend",
     "start": "node server.js",
-    "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "npm run seed -w apps/backend"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/khahuy/Brewlite.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/khahuy/Brewlite/issues"
-  },
-  "homepage": "https://github.com/khahuy/Brewlite#readme",
   "dependencies": {
     "dotenv": "^18.0.5",
     "mongoose": "^9.10.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

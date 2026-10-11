@@ -78,3 +78,82 @@ Khi kết nối thành công, console sẽ hiển thị thông báo:
 2. **Lỗi kết nối timeout / `MongooseServerSelectionError`**:
    - Vào MongoDB Atlas -> **Network Access** -> Chọn **Add IP Address**.
    - Thêm IP hiện tại của bạn hoặc chọn **Allow Access from Anywhere** (`0.0.0.0/0`) cho môi trường phát triển (development).
+
+
+# BrewLite Coffee Ordering App
+
+Monorepo đặt đồ uống: **NestJS** backend + **Next.js** frontend + **MongoDB Atlas**.
+
+## Cấu trúc
+
+```
+Brewlite/
+├── apps/
+│   ├── backend/     # NestJS API (port 3001)
+│   └── frontend/    # Next.js UI (port 3000)
+├── config/db.js     # Kết nối Mongo thử nghiệm
+├── server.js
+├── .env.example
+└── package.json
+```
+
+## Yêu cầu
+
+- Node.js 18+
+- Tài khoản MongoDB Atlas
+
+## Cài đặt
+
+```bash
+# 1. Cài dependencies (root + workspaces)
+npm install
+
+# 2. Copy env
+cp .env.example .env
+cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env.local
+
+# 3. Điền mật khẩu MongoDB vào .env và apps/backend/.env
+```
+
+## Chạy
+
+```bash
+# Chạy cả backend + frontend
+npm run dev
+
+# Hoặc riêng lẻ
+npm run dev:backend
+npm run dev:frontend
+```
+
+- Frontend (Menu): http://localhost:3000  
+- Backend Hello: http://localhost:3001  
+- API products: http://localhost:3001/products  
+
+## Task đã làm
+
+| Task | Mô tả |
+|------|--------|
+| 1 | Khởi tạo monorepo Next.js + NestJS, Hello World, README, `.env.example` |
+| 2 | `GET /products` trả JSON menu (`id`, `name`, `price`, `image`) từ MongoDB |
+| 3 | Trang Menu gọi API, lưới sản phẩm, loading & empty state |
+
+## API mẫu
+
+`GET /products`
+
+```json
+[
+  {
+    "id": "...",
+    "name": "Cà phê sữa đá",
+    "price": 35000,
+    "image": "https://...",
+    "description": "...",
+    "category": "traditional"
+  }
+]
+```
+
+Lần đầu backend khởi động sẽ **tự seed** 6 món mẫu nếu collection `products` trống.
