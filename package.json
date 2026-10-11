@@ -1,0 +1,23 @@
+{
+  "name": "brewlite",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c cyan,magenta \"npm run start:dev -w apps/backend\" \"npm run dev -w apps/frontend\"",
+    "dev:backend": "npm run start:dev -w apps/backend",
+    "dev:frontend": "npm run dev -w apps/frontend",
+    "start": "node server.js",
+    "seed": "npm run seed -w apps/backend"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "mongoose": "^9.10.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

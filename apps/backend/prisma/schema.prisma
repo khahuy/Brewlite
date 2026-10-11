@@ -1,0 +1,10 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("mongodb+srv://brewlite:brewlite@cluster0.getldgi.mongodb.net/?appName=Cluster0")
+}
