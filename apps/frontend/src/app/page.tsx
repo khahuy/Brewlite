@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import ProductOptions from '@/components/ProductOptions';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
+import { useCart } from '@/context/CartContext';
 import { fetchProducts } from '@/services/api';
 import type { Product } from '@/types';
 
 const CATEGORIES = [
   { id: 'all', label: 'Tất cả' },
-  { id: 'traditional', label: 'Cà phê truyền thống' },
+  { id: 'traditional', label: 'Cà phê' },
   { id: 'coldbrew', label: 'Cold Brew & Espresso' },
   { id: 'fruittea', label: 'Trà trái cây' },
   { id: 'pastry', label: 'Bánh ngọt' },
@@ -18,8 +21,10 @@ export default function MenuPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { addItem } = useCart();
 
   useEffect(() => {
     let cancelled = false;
@@ -45,143 +50,159 @@ export default function MenuPage() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((item) => {
-      const matchCat =
-        selectedCategory === 'all' || item.category === selectedCategory;
-      const matchSearch =
-        !searchQuery.trim() ||
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCat && matchSearch;
-    });
-  }, [products, selectedCategory, searchQuery]);
+    const normalizedSearch = searchTerm.trim().toLocaleLowerCase('vi');
 
-  // Determine badge for item based on index/id
-  const getBadge = (product: Product, index: number): 'BÁN CHẠY' | 'MỚI' | undefined => {
-    if (index === 0) return 'BÁN CHẠY';
-    if (index === 2 || index === 4) return 'MỚI';
-    return undefined;
+    return products.filter((product) => {
+      const matchesCategory =
+        activeCategory === 'all' || product.category === activeCategory;
+      const matchesSearch =
+        !normalizedSearch ||
+        `${product.name} ${product.description ?? ''} ${product.category ?? ''}`
+          .toLocaleLowerCase('vi')
+          .includes(normalizedSearch);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, products, searchTerm]);
+
+  const handleAddToCart = (size: string, price: number) => {
+    if (!selectedProduct) return;
+    addItem(selectedProduct, size, price);
+    setSelectedProduct(null);
   };
 
   return (
-    <main className="page">
-      {/* Hero Banner matching Figma */}
-      <section className="hero">
-        <div className="hero-content">
-          <p className="hero-eyebrow">
-            <span className="sparkle-icon">✦</span> HÔM NAY TẠI BREWLITE
-          </p>
-          <h1>
-            Mỗi ly cà phê,
-            <br />
-            <span>một khoảnh khắc.</span>
-          </h1>
-          <p className="hero-slogan">Cashierless · Cashless · Cà phê thật ngon</p>
-        </div>
-
-        <div className="hero-stats">
-          <div className="hero-stat-card">
-            <span className="stat-number">{products.length || 6}</span>
-            <span className="stat-label">MÓN MỚI</span>
+    <div className="menu-preview">
+      <main>
+        <section className="hero">
+          <div className="hero__copy">
+            <p className="eyebrow">HÔM NAY TẠI BREWLITE</p>
+            <h1>
+              Mỗi ly cà phê,
+              <br />
+              <span>một khoảnh khắc.</span>
+            </h1>
+            <p className="hero__description">
+              Nguyên liệu chọn lọc, pha chế bằng cả sự tận tâm.
+            </p>
+            <a href="#menu" className="hero__link">
+              Khám phá thực đơn <span aria-hidden="true">↓</span>
+            </a>
           </div>
-          <div className="hero-stat-divider" />
-          <div className="hero-stat-card">
-            <span className="stat-number">0đ</span>
-            <span className="stat-label">PHÍ GIAO VẬN</span>
+          <div className="hero__art" aria-hidden="true">
+            <div className="hero__sun" />
+            <div className="hero__cup">
+              <div className="hero__coffee" />
+              <div className="hero__steam hero__steam--one" />
+              <div className="hero__steam hero__steam--two" />
+              <div className="hero__handle" />
+            </div>
+            <div className="hero__saucer" />
+            <span className="hero__sparkle hero__sparkle--one">✳</span>
+            <span className="hero__sparkle hero__sparkle--two">✦</span>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Search Input matching Figma */}
-      <div className="search-bar-wrap">
-        <div className="search-bar-inner">
-          <svg
-            className="search-icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Tìm cà phê, trà, bánh..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery ? (
-            <button
-              type="button"
-              className="search-clear-btn"
-              onClick={() => setSearchQuery('')}
-            >
-              ✕
-            </button>
+        <section className="menu-section" id="menu">
+          <div className="menu-heading">
+            <div>
+              <p className="eyebrow">Pha mới mỗi ngày</p>
+              <h2>Thực đơn hôm nay</h2>
+            </div>
+            {!loading && !error ? (
+              <p className="menu-heading__count">
+                {filteredProducts.length} món ngon đang chờ bạn
+              </p>
+            ) : null}
+          </div>
+
+          <div className="menu-controls">
+            <div className="category-tabs" aria-label="Lọc theo danh mục">
+              {CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  className={`category-tab${activeCategory === category.id ? ' is-active' : ''}`}
+                  onClick={() => setActiveCategory(category.id)}
+                  aria-pressed={activeCategory === category.id}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <input
+                type="search"
+                placeholder="Tìm món bạn thích..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                aria-label="Tìm món trong thực đơn"
+              />
+            </label>
+          </div>
+
+          {loading ? <LoadingSkeleton /> : null}
+
+          {!loading && error ? (
+            <div className="error-state" role="alert">
+              <h3>Không tải được menu</h3>
+              <p>{error}</p>
+              <p className="error-help">
+                Kiểm tra backend đang chạy tại{' '}
+                {process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}
+              </p>
+            </div>
           ) : null}
-        </div>
-      </div>
 
-      {/* Categories Filter matching Figma */}
-      <div className="categories-pill-row">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            className={`category-pill ${selectedCategory === cat.id ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
+          {!loading && !error && filteredProducts.length > 0 ? (
+            <div className="product-grid">
+              {filteredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  badge={product.badge ?? (index === 0 ? 'BÁN CHẠY' : undefined)}
+                  isFavorite={product.isFavorite ?? [0, 1, 3].includes(index)}
+                  onOpenOptions={setSelectedProduct}
+                />
+              ))}
+            </div>
+          ) : null}
 
-      {/* Section Title */}
-      <div className="section-title">
-        <h2>Thực đơn hôm nay</h2>
-        {!loading && !error ? (
-          <span className="count">({filteredProducts.length})</span>
-        ) : null}
-      </div>
+          {!loading && !error && filteredProducts.length === 0 ? (
+            <div className="empty-state">
+              <span aria-hidden="true">☕</span>
+              <h3>Chưa tìm thấy món phù hợp</h3>
+              <p>Thử từ khóa khác hoặc chọn một danh mục khác nhé.</p>
+              <button
+                type="button"
+                className="reset-filter"
+                onClick={() => {
+                  setSearchTerm('');
+                  setActiveCategory('all');
+                }}
+              >
+                Xem toàn bộ thực đơn
+              </button>
+            </div>
+          ) : null}
+        </section>
+      </main>
 
-      {loading ? <LoadingSkeleton /> : null}
+      <footer className="site-footer">
+        <Link className="brand brand--footer" href="/">
+          Brew<span>Lite</span>
+        </Link>
+        <p>Được pha bằng sự tử tế, dành riêng cho khoảnh khắc của bạn.</p>
+        <span>© 2026 BrewLite</span>
+      </footer>
 
-      {!loading && error ? (
-        <div className="error-state">
-          <h3>Không tải được menu</h3>
-          <p>{error}</p>
-          <p style={{ marginTop: 8, fontSize: 13 }}>
-            Kiểm tra backend đang chạy tại{' '}
-            {process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}
-          </p>
-        </div>
-      ) : null}
-
-      {!loading && !error && filteredProducts.length === 0 ? (
-        <div className="empty-state">
-          <h3>Không tìm thấy món phù hợp</h3>
-          <p>Hãy thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác.</p>
-        </div>
-      ) : null}
-
-      {!loading && !error && filteredProducts.length > 0 ? (
-        <div className="product-grid">
-          {filteredProducts.map((product, idx) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              badge={getBadge(product, idx)}
-              isFavorite={idx === 0 || idx === 1 || idx === 3}
-            />
-          ))}
-        </div>
-      ) : null}
-    </main>
+      <ProductOptions
+        key={selectedProduct?.id ?? 'closed'}
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={handleAddToCart}
+      />
+    </div>
   );
 }

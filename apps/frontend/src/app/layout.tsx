@@ -4,6 +4,7 @@ import CartDrawer from '@/components/CartDrawer';
 import Toast from '@/components/Toast';
 import { CartProvider } from '@/context/CartContext';
 import './globals.css';
+import './menu-preview.css';
 
 export const metadata: Metadata = {
   title: 'BrewLite — Đặt cà phê nhanh chóng',

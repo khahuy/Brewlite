@@ -14,7 +14,7 @@ interface CartContextType {
   promoError: string | null;
   isCartOpen: boolean;
   toastMessage: string | null;
-  addItem: (product: Product, size?: string) => void;
+  addItem: (product: Product, size?: string, price?: number) => void;
   updateQuantity: (itemId: string, delta: number) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;
@@ -78,7 +78,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setToastMessage(message);
   };
 
-  const addItem = (product: Product, size: string = DEFAULT_SIZE) => {
+  const addItem = (
+    product: Product,
+    size: string = DEFAULT_SIZE,
+    price: number = product.price,
+  ) => {
     const itemId = `${product.id}-${size}`;
     setItems((prev) => {
       const existingIndex = prev.findIndex((i) => i.id === itemId);
@@ -96,7 +100,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           id: itemId,
           productId: product.id,
           name: product.name,
-          price: product.price,
+          price,
           image: product.image,
           size,
           quantity: 1,
